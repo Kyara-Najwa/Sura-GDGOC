@@ -1,6 +1,10 @@
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+
 import '../controllers/navigasi_controller.dart';
+import '../theme.dart';
 import 'halaman_benchmark.dart';
 import 'halaman_hud.dart';
 import 'halaman_komunikasi.dart';
@@ -23,26 +27,26 @@ class _ItemTab {
 const _daftarTab = <_ItemTab>[
   _ItemTab(
     nama: 'Komunikasi',
-    ikon: Icons.chat_bubble_outline,
-    ikonAktif: Icons.chat_bubble,
+    ikon: LucideIcons.messageCircle,
+    ikonAktif: LucideIcons.messageCircle,
     halaman: HalamanKomunikasi(),
   ),
   _ItemTab(
     nama: 'HUD',
-    ikon: Icons.visibility_outlined,
-    ikonAktif: Icons.visibility,
+    ikon: LucideIcons.glasses,
+    ikonAktif: LucideIcons.glasses,
     halaman: HalamanHud(),
   ),
   _ItemTab(
     nama: 'Benchmark',
-    ikon: Icons.analytics_outlined,
-    ikonAktif: Icons.analytics,
+    ikon: LucideIcons.chartNoAxesCombined,
+    ikonAktif: LucideIcons.chartNoAxesCombined,
     halaman: HalamanBenchmark(),
   ),
   _ItemTab(
     nama: 'Profil',
-    ikon: Icons.person_outline,
-    ikonAktif: Icons.person,
+    ikon: LucideIcons.userRound,
+    ikonAktif: LucideIcons.userRound,
     halaman: HalamanProfil(),
   ),
 ];
@@ -55,21 +59,48 @@ class HalamanUtama extends StatelessWidget {
     final navigasi = context.watch<NavigasiController>();
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
+
       appBar: AppBar(
-        title: Text('Sura · ${_daftarTab[navigasi.tabAktif].nama}'),
+        title: Text(
+          'Sura · ${_daftarTab[navigasi.tabAktif].nama}',
+          style: const TextStyle(
+            fontSize: 19,
+            fontWeight: FontWeight.bold,
+            color: BL.ink,
+          ),
+        ),
+        centerTitle: false,
       ),
+
       body: IndexedStack(
         index: navigasi.tabAktif,
-        children: [for (final tab in _daftarTab) tab.halaman],
+        children: [
+          for (final tab in _daftarTab) tab.halaman,
+        ],
       ),
+
       bottomNavigationBar: NavigationBar(
         selectedIndex: navigasi.tabAktif,
-        onDestinationSelected: context.read<NavigasiController>().pilihTab,
+        onDestinationSelected:
+            context.read<NavigasiController>().pilihTab,
+        backgroundColor: BL.glass,
+        indicatorColor: BL.sky600.withValues(alpha: 0.15),
+        elevation: 0,
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
         destinations: [
           for (final tab in _daftarTab)
             NavigationDestination(
-              icon: Icon(tab.ikon),
-              selectedIcon: Icon(tab.ikonAktif),
+              icon: Icon(
+                tab.ikon,
+                size: 21,
+                color: BL.inkMuted,
+              ),
+              selectedIcon: Icon(
+                tab.ikonAktif,
+                size: 22,
+                color: BL.sky700,
+              ),
               label: tab.nama,
             ),
         ],
