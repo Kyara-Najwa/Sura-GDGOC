@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../controllers/komunikasi_controller.dart';
 import '../theme.dart';
 
@@ -32,6 +33,23 @@ class _HalamanKomunikasiState extends State<HalamanKomunikasi> {
         curve: Curves.easeOut,
       );
     });
+  }
+
+  void _bukaLayarPenuh() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => HalamanSubtitlePenuh(
+          ukuranTeks: _ukuranTeks,
+          saatUkuranBerubah: (nilai) {
+            if (!mounted) return;
+
+            setState(() {
+              _ukuranTeks = nilai;
+            });
+          },
+        ),
+      ),
+    );
   }
 
   @override
@@ -126,7 +144,7 @@ class _HalamanKomunikasiState extends State<HalamanKomunikasi> {
 
           const SizedBox(height: 16),
 
-          // Area subtitle dan pengaturan ukuran teks
+          // Area subtitle
           Expanded(
             child: Container(
               width: double.infinity,
@@ -135,6 +153,32 @@ class _HalamanKomunikasiState extends State<HalamanKomunikasi> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  // Header area subtitle
+                  Row(
+                    children: [
+                      const Expanded(
+                        child: Text(
+                          'Subtitle Percakapan',
+                          style: TextStyle(
+                            color: BL.ink,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                      IconButton.outlined(
+                        onPressed: _bukaLayarPenuh,
+                        tooltip: 'Buka layar penuh',
+                        icon: const Icon(
+                          Icons.fullscreen_rounded,
+                          color: BL.sky600,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 8),
+
                   // Tampilan percakapan
                   Expanded(
                     child: kosong
@@ -157,8 +201,9 @@ class _HalamanKomunikasiState extends State<HalamanKomunikasi> {
                                   const SizedBox(height: 14),
                                   for (final kalimat in k.kalimat)
                                     Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 16),
+                                      padding: const EdgeInsets.only(
+                                        bottom: 16,
+                                      ),
                                       child: Text(
                                         kalimat,
                                         style: TextStyle(
@@ -179,7 +224,7 @@ class _HalamanKomunikasiState extends State<HalamanKomunikasi> {
                                       Container(
                                         width: 7,
                                         height: 7,
-                                        decoration: BoxDecoration(
+                                        decoration: const BoxDecoration(
                                           color: BL.sky600,
                                           shape: BoxShape.circle,
                                         ),
@@ -216,7 +261,7 @@ class _HalamanKomunikasiState extends State<HalamanKomunikasi> {
                   const Divider(height: 1),
                   const SizedBox(height: 12),
 
-                  // Pengaturan ukuran subtitle
+                  // Pengaturan ukuran teks
                   Row(
                     children: [
                       const Icon(
@@ -235,64 +280,19 @@ class _HalamanKomunikasiState extends State<HalamanKomunikasi> {
                           ),
                         ),
                       ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: BL.sky600.withValues(alpha: 0.10),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          '${_ukuranTeks.round()} px',
-                          style: const TextStyle(
-                            color: BL.sky700,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
+                      _labelUkuran(_ukuranTeks),
                     ],
                   ),
 
                   const SizedBox(height: 4),
 
-                  Row(
-                    children: [
-                      const Text(
-                        'A',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: BL.inkMuted,
-                        ),
-                      ),
-                      Expanded(
-                        child: Slider(
-                          value: _ukuranTeks,
-                          min: 16,
-                          max: 40,
-                          divisions: 24,
-                          label: '${_ukuranTeks.round()} px',
-                          activeColor: BL.sky600,
-                          inactiveColor:
-                              BL.sky600.withValues(alpha: 0.15),
-                          onChanged: (nilai) {
-                            setState(() {
-                              _ukuranTeks = nilai;
-                            });
-                          },
-                        ),
-                      ),
-                      const Text(
-                        'A',
-                        style: TextStyle(
-                          fontSize: 23,
-                          fontWeight: FontWeight.bold,
-                          color: BL.inkMuted,
-                        ),
-                      ),
-                    ],
+                  _sliderUkuran(
+                    nilai: _ukuranTeks,
+                    saatBerubah: (nilai) {
+                      setState(() {
+                        _ukuranTeks = nilai;
+                      });
+                    },
                   ),
                 ],
               ),
@@ -329,7 +329,9 @@ class _HalamanKomunikasiState extends State<HalamanKomunikasi> {
                       ? context.read<KomunikasiController>().berhenti
                       : context.read<KomunikasiController>().mulai,
                   icon: Icon(
-                    k.mendengar ? Icons.stop_rounded : Icons.mic_rounded,
+                    k.mendengar
+                        ? Icons.stop_rounded
+                        : Icons.mic_rounded,
                   ),
                   label: Text(
                     k.mendengar
@@ -368,6 +370,64 @@ class _HalamanKomunikasiState extends State<HalamanKomunikasi> {
     );
   }
 
+  Widget _labelUkuran(double ukuran) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 10,
+        vertical: 5,
+      ),
+      decoration: BoxDecoration(
+        color: BL.sky600.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Text(
+        '${ukuran.round()} px',
+        style: const TextStyle(
+          color: BL.sky700,
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  Widget _sliderUkuran({
+    required double nilai,
+    required ValueChanged<double> saatBerubah,
+  }) {
+    return Row(
+      children: [
+        const Text(
+          'A',
+          style: TextStyle(
+            fontSize: 12,
+            color: BL.inkMuted,
+          ),
+        ),
+        Expanded(
+          child: Slider(
+            value: nilai,
+            min: 16,
+            max: 40,
+            divisions: 24,
+            label: '${nilai.round()} px',
+            activeColor: BL.sky600,
+            inactiveColor: BL.sky600.withValues(alpha: 0.15),
+            onChanged: saatBerubah,
+          ),
+        ),
+        const Text(
+          'A',
+          style: TextStyle(
+            fontSize: 23,
+            fontWeight: FontWeight.bold,
+            color: BL.inkMuted,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _tampilanKosong(bool mendengar) {
     return Center(
       child: Column(
@@ -381,7 +441,9 @@ class _HalamanKomunikasiState extends State<HalamanKomunikasi> {
               shape: BoxShape.circle,
             ),
             child: Icon(
-              mendengar ? Icons.graphic_eq : Icons.hearing_outlined,
+              mendengar
+                  ? Icons.graphic_eq
+                  : Icons.hearing_outlined,
               size: 36,
               color: BL.sky600,
             ),
@@ -409,6 +471,335 @@ class _HalamanKomunikasiState extends State<HalamanKomunikasi> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ======================================================
+// HALAMAN SUBTITLE LAYAR PENUH
+// ======================================================
+
+class HalamanSubtitlePenuh extends StatefulWidget {
+  const HalamanSubtitlePenuh({
+    super.key,
+    required this.ukuranTeks,
+    required this.saatUkuranBerubah,
+  });
+
+  final double ukuranTeks;
+  final ValueChanged<double> saatUkuranBerubah;
+
+  @override
+  State<HalamanSubtitlePenuh> createState() =>
+      _HalamanSubtitlePenuhState();
+}
+
+class _HalamanSubtitlePenuhState extends State<HalamanSubtitlePenuh> {
+  final ScrollController _gulir = ScrollController();
+
+  bool _perluGulir = false;
+
+  @override
+  void dispose() {
+    _gulir.dispose();
+    super.dispose();
+  }
+
+  void _jadwalkanGulir() {
+    if (_perluGulir) return;
+
+    _perluGulir = true;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _perluGulir = false;
+
+      if (!mounted || !_gulir.hasClients) return;
+
+      _gulir.animateTo(
+        _gulir.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOut,
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final k = context.watch<KomunikasiController>();
+    final kosong = k.kalimat.isEmpty && k.sementara.isEmpty;
+
+    if (!kosong) {
+      _jadwalkanGulir();
+    }
+
+    return Scaffold(
+      backgroundColor: const Color(0xFF101827),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 22,
+            vertical: 16,
+          ),
+          child: Column(
+            children: [
+              // Header layar penuh
+              Row(
+                children: [
+                  const Icon(
+                    Icons.graphic_eq_rounded,
+                    color: Color(0xFF7DD3FC),
+                    size: 25,
+                  ),
+                  const SizedBox(width: 10),
+                  const Expanded(
+                    child: Text(
+                      'Sura Subtitle',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  if (k.mendengar)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 11,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF164E63),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(
+                            Icons.circle,
+                            color: Color(0xFF7DD3FC),
+                            size: 8,
+                          ),
+                          SizedBox(width: 6),
+                          Text(
+                            'LIVE',
+                            style: TextStyle(
+                              color: Color(0xFFBAE6FD),
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    tooltip: 'Keluar dari layar penuh',
+                    icon: const Icon(
+                      Icons.close_rounded,
+                      color: Colors.white,
+                      size: 27,
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 12),
+              Divider(
+                color: Colors.white.withValues(alpha: 0.15),
+                height: 1,
+              ),
+
+              // Isi subtitle
+              Expanded(
+                child: kosong
+                    ? Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              k.mendengar
+                                  ? Icons.graphic_eq_rounded
+                                  : Icons.hearing_outlined,
+                              color: const Color(0xFF7DD3FC),
+                              size: 54,
+                            ),
+                            const SizedBox(height: 20),
+                            Text(
+                              k.mendengar
+                                  ? 'Menunggu seseorang berbicara...'
+                                  : 'Belum ada percakapan',
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 19,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            const Text(
+                              'Subtitle akan muncul di sini',
+                              style: TextStyle(
+                                color: Color(0xFF94A3B8),
+                                fontSize: 13,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : SingleChildScrollView(
+                        controller: _gulir,
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minHeight: MediaQuery.of(context).size.height *
+                                0.35,
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              for (final kalimat in k.kalimat)
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    bottom: 22,
+                                  ),
+                                  child: Text(
+                                    kalimat,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: widget.ukuranTeks,
+                                      height: 1.5,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              if (k.sementara.isNotEmpty)
+                                Text(
+                                  k.sementara,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: const Color(0xFF7DD3FC),
+                                    fontSize: widget.ukuranTeks,
+                                    height: 1.5,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+              ),
+
+              const SizedBox(height: 12),
+
+              // Panel pengaturan ukuran
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1E293B),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.10),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.format_size_rounded,
+                          color: Color(0xFF7DD3FC),
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        const Expanded(
+                          child: Text(
+                            'Ukuran teks',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          '${widget.ukuranTeks.round()} px',
+                          style: const TextStyle(
+                            color: Color(0xFF7DD3FC),
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        const Text(
+                          'A',
+                          style: TextStyle(
+                            color: Color(0xFFCBD5E1),
+                            fontSize: 12,
+                          ),
+                        ),
+                        Expanded(
+                          child: Slider(
+                            value: widget.ukuranTeks,
+                            min: 16,
+                            max: 40,
+                            divisions: 24,
+                            label: '${widget.ukuranTeks.round()} px',
+                            activeColor: const Color(0xFF38BDF8),
+                            inactiveColor: const Color(0xFF475569),
+                            onChanged: widget.saatUkuranBerubah,
+                          ),
+                        ),
+                        const Text(
+                          'A',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 23,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              // Status dan tombol keluar
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      k.mendengar
+                          ? 'Subtitle sedang berjalan'
+                          : 'Mode layar penuh',
+                      style: const TextStyle(
+                        color: Color(0xFF94A3B8),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                  TextButton.icon(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.fullscreen_exit_rounded),
+                    label: const Text('Kembali'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: const Color(0xFF7DD3FC),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
