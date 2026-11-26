@@ -14,6 +14,8 @@ class HalamanKomunikasi extends StatefulWidget {
 class _HalamanKomunikasiState extends State<HalamanKomunikasi> {
   final ScrollController _gulir = ScrollController();
 
+  double _ukuranTeks = 24;
+
   @override
   void dispose() {
     _gulir.dispose();
@@ -124,84 +126,176 @@ class _HalamanKomunikasiState extends State<HalamanKomunikasi> {
 
           const SizedBox(height: 16),
 
-          // Area subtitle
+          // Area subtitle dan pengaturan ukuran teks
           Expanded(
             child: Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: glassCard(),
-              child: kosong
-                  ? _tampilanKosong(k.mendengar)
-                  : SingleChildScrollView(
-                      controller: _gulir,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (k.kalimat.isNotEmpty) ...[
-                            const Text(
-                              'HASIL PERCAKAPAN',
-                              style: TextStyle(
-                                color: BL.inkMuted,
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 1,
-                              ),
-                            ),
-                            const SizedBox(height: 14),
-                            for (final kalimat in k.kalimat)
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 16),
-                                child: Text(
-                                  kalimat,
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    height: 1.5,
-                                    color: BL.ink,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ),
-                          ],
-
-                          if (k.sementara.isNotEmpty) ...[
-                            if (k.kalimat.isNotEmpty)
-                              const Divider(height: 24),
-                            Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Tampilan percakapan
+                  Expanded(
+                    child: kosong
+                        ? _tampilanKosong(k.mendengar)
+                        : SingleChildScrollView(
+                            controller: _gulir,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Container(
-                                  width: 7,
-                                  height: 7,
-                                  decoration: BoxDecoration(
-                                    color: BL.sky600,
-                                    shape: BoxShape.circle,
+                                if (k.kalimat.isNotEmpty) ...[
+                                  const Text(
+                                    'HASIL PERCAKAPAN',
+                                    style: TextStyle(
+                                      color: BL.inkMuted,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 1,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(width: 8),
-                                const Text(
-                                  'SEDANG DIUCAPKAN',
-                                  style: TextStyle(
-                                    color: BL.sky700,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 0.8,
+                                  const SizedBox(height: 14),
+                                  for (final kalimat in k.kalimat)
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 16),
+                                      child: Text(
+                                        kalimat,
+                                        style: TextStyle(
+                                          fontSize: _ukuranTeks,
+                                          height: 1.5,
+                                          color: BL.ink,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+
+                                if (k.sementara.isNotEmpty) ...[
+                                  if (k.kalimat.isNotEmpty)
+                                    const Divider(height: 24),
+                                  Row(
+                                    children: [
+                                      Container(
+                                        width: 7,
+                                        height: 7,
+                                        decoration: BoxDecoration(
+                                          color: BL.sky600,
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      const Text(
+                                        'SEDANG DIUCAPKAN',
+                                        style: TextStyle(
+                                          color: BL.sky700,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 0.8,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    k.sementara,
+                                    style: TextStyle(
+                                      fontSize: _ukuranTeks,
+                                      height: 1.5,
+                                      color: BL.ink,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
                               ],
                             ),
-                            const SizedBox(height: 12),
-                            Text(
-                              k.sementara,
-                              style: const TextStyle(
-                                fontSize: 25,
-                                height: 1.5,
-                                color: BL.ink,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ],
-                        ],
+                          ),
+                  ),
+
+                  const SizedBox(height: 12),
+                  const Divider(height: 1),
+                  const SizedBox(height: 12),
+
+                  // Pengaturan ukuran subtitle
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.format_size_rounded,
+                        color: BL.sky600,
+                        size: 20,
                       ),
-                    ),
+                      const SizedBox(width: 8),
+                      const Expanded(
+                        child: Text(
+                          'Ukuran teks',
+                          style: TextStyle(
+                            color: BL.ink,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: BL.sky600.withValues(alpha: 0.10),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          '${_ukuranTeks.round()} px',
+                          style: const TextStyle(
+                            color: BL.sky700,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 4),
+
+                  Row(
+                    children: [
+                      const Text(
+                        'A',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: BL.inkMuted,
+                        ),
+                      ),
+                      Expanded(
+                        child: Slider(
+                          value: _ukuranTeks,
+                          min: 16,
+                          max: 40,
+                          divisions: 24,
+                          label: '${_ukuranTeks.round()} px',
+                          activeColor: BL.sky600,
+                          inactiveColor:
+                              BL.sky600.withValues(alpha: 0.15),
+                          onChanged: (nilai) {
+                            setState(() {
+                              _ukuranTeks = nilai;
+                            });
+                          },
+                        ),
+                      ),
+                      const Text(
+                        'A',
+                        style: TextStyle(
+                          fontSize: 23,
+                          fontWeight: FontWeight.bold,
+                          color: BL.inkMuted,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
 
